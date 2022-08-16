@@ -69,13 +69,13 @@ const PaymentSchema = new mongoose.Schema(
       type: String,
       trim: true,
       required: [true, 'Customer Id is required'],
-      unique: true,
+
     },
     chequeId: {
       type: String,
       trim: true,
       required: [true, 'ChequeId is required'],
-      unique: true,
+      
     },
     circuit: [circuitSchema],
     previousBalance: [previousBalanceSchema],
