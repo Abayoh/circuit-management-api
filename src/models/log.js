@@ -32,7 +32,7 @@ const LogSchema = new mongoose.Schema(
       trim: true,
       required: [true, 'ObjectType is required'],
     },
-    old: [oldSchema],
+    old: oldSchema,
   },
   { versionKey: false }
 );

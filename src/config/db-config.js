@@ -5,7 +5,7 @@ const connectDB = async () => {
     const password = process.env.MONGODB_PASSWORD;
     const user = process.env.MONGODB_USER;
     const dbName = process.env.MONGODB_DB_NAME;
-    const url = `mongodb+srv://${user}:${password}@cluster0.adocr6l.mongodb.net/?retryWrites=true&w=majority`;
+    const url = `mongodb+srv://${user}:${password}@cluster0.adocr6l.mongodb.net/${dbName}?retryWrites=true&w=majority`;
     const conn = await mongoose.connect(url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

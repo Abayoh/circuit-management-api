@@ -3,7 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 //const financialDataRouter = require('./routes/financial-data-routes.js');
 const connectDb = require('./config/db-config.js');
-//const loginRouter = require('./routes/login-routes');
+const customerRouter = require('./routes/customer-route');
 //
 
 dotenv.config();
@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(cors());
 
 //Add home response
-app.get('/', (req, res) => {
+app.get('/cmg/v0', (req, res) => {
   return res.status(200).json({
     msg: 'Welcome to CCL Capacity Manager Dashboard API',
     version: '1.0.0',
@@ -29,36 +29,34 @@ app.get('/', (req, res) => {
 });
 
 //Enable login
-//app.use('/lec-api/v0', loginRouter);
+//app.use('/cmg/v0/login', loginRouter);
 
 //Enable authentication middleware
 //app.use(authenticate);
 
-//Users routes
-//app.use('/lec-api/v0/users', userRouter);
+//Customers routes
+app.use('/cmg/v0/customers', customerRouter);
 
 //Technical KPI routes
-//app.use('/lec-api/v0/technical-kpis', technicalKpiRouters);
+//app.use('/cmg/v0/technical-kpis', technicalKpiRouters);
 
 //Substation KPI routes
-//app.use('/lec-api/v0/substation-kpis', substationKpiRouter);
+//app.use('/cmg/v0/substation-kpis', substationKpiRouter);
 
 //Transmission Data routes
-//app.use('/lec-api/v0/transmission-data', transmissionDataRouter);
+//app.use('/cmg/v0/transmission-data', transmissionDataRouter);
 //Financial Data routes
-//app.use('/lec-api/v0/financial-data', financialDataRouter);
-//app.use('/lec-api/v0/transmission-data', transmissionDataRouter);
+//app.use('/cmg/v0/financial-data', financialDataRouter);
+//app.use('/cmg/v0/transmission-data', transmissionDataRouter);
 
 //Power Plant Data routes
-//app.use('/lec-api/v0/power-plant-data', powerPlantRouter);
-
+//app.use('/cmg/v0/power-plant-data', powerPlantRouter);
 
 //Customer Billing Data routes
-//app.use('/lec-api/v0/customer-billing-data', customerBillingRouter);
+//app.use('/cmg/v0/customer-billing-data', customerBillingRouter);
 
 //Department Wage routes.
-//app.use('/lec-api/v0/department-wages', departmentWageRouter);
-
+//app.use('/cmg/v0/department-wages', departmentWageRouter);
 
 const PORT = process.env.PORT || 5001;
 

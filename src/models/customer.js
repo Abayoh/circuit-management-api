@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 const addressSchema = new mongoose.Schema(
   {
     address1: {
@@ -41,7 +40,7 @@ const CustomerSchema = new mongoose.Schema(
       trim: true,
       required: [true, 'Customer Type is required'],
     },
-    address: [addressSchema],
+    address: addressSchema,
     contacts: {
       type: String,
       trim: true,
@@ -52,4 +51,4 @@ const CustomerSchema = new mongoose.Schema(
   { versionKey: false }
 );
 
-module.exports = mongoose.model('customer', CustomerSchema);
+module.exports = mongoose.model('customers', CustomerSchema);

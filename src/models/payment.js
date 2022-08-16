@@ -77,12 +77,12 @@ const PaymentSchema = new mongoose.Schema(
       required: [true, 'ChequeId is required'],
       
     },
-    circuit: [circuitSchema],
-    previousBalance: [previousBalanceSchema],
+    circuit: circuitSchema,
+    previousBalance: previousBalanceSchema,
     current: {
       type: Boolean,
     },
-    Billed: [billedSchema],
+    Billed: billedSchema,
     balance: {
       type: Number,
       min: 0,
