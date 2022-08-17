@@ -1,4 +1,5 @@
 const CustomerSchema = require('../models/customer');
+const common = require('./common');
 
 //@desc Create a new Customer  in mongodb
 //@route POST /cmg/v0/customer
@@ -49,12 +50,12 @@ exports.updateCustomer = async (req, res, next) => {
   try {
     const data = await req.body;
     const { id } = req.params;
-    const {modifiedCount} = await CustomerSchema.updateOne({ _id:id }, data);
-    if(modifiedCount===0){
-        return res.status(500).json({
-            success:false,
-            msg:'0 modified'
-        })
+    const { modifiedCount } = await CustomerSchema.updateOne({ _id: id }, data);
+    if (modifiedCount === 0) {
+      return res.status(500).json({
+        success: false,
+        msg: '0 modified',
+      });
     }
     return res.status(200).json({
       success: true,

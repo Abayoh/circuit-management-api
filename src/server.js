@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 //const financialDataRouter = require('./routes/financial-data-routes.js');
 const connectDb = require('./config/db-config.js');
 const customerRouter = require('./routes/customer-route');
+const chequeRouter = require('./routes/cheque-route');
 //
 
 dotenv.config();
@@ -37,8 +38,8 @@ app.get('/cmg/v0', (req, res) => {
 //Customers routes
 app.use('/cmg/v0/customers', customerRouter);
 
-//Technical KPI routes
-//app.use('/cmg/v0/technical-kpis', technicalKpiRouters);
+//Cheque routes
+app.use('/cmg/v0/cheques', chequeRouter);
 
 //Substation KPI routes
 //app.use('/cmg/v0/substation-kpis', substationKpiRouter);
