@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const connectDb = require('./config/db-config.js');
 const customerRouter = require('./routes/customer-route');
 const chequeRouter = require('./routes/cheque-route');
+const circuitRouter = require('./routes/circuit-route');
 //
 
 dotenv.config();
@@ -41,8 +42,8 @@ app.use('/cmg/v0/customers', customerRouter);
 //Cheque routes
 app.use('/cmg/v0/cheques', chequeRouter);
 
-//Substation KPI routes
-//app.use('/cmg/v0/substation-kpis', substationKpiRouter);
+//Circuit routes
+app.use('/cmg/v0/circuits', circuitRouter);
 
 //Transmission Data routes
 //app.use('/cmg/v0/transmission-data', transmissionDataRouter);
