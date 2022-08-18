@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 // old schema
 const oldSchema = new mongoose.Schema(
   {
-    objectId: {
+    entityId: {
       type: String,
       required: [true, 'ObjectId  is required'],
     },
     data: {
-      type: String,
+      type: {},
       required: [true, 'old data is required'],
     },
   },
@@ -27,14 +27,14 @@ const LogSchema = new mongoose.Schema(
       trim: true,
       required: [true, 'Action is required'],
     },
-    objectType: {
+    dataType: {
       type: String,
       trim: true,
       required: [true, 'ObjectType is required'],
     },
     old: oldSchema,
   },
-  { versionKey: false }
+  { versionKey: false } 
 );
 
 module.exports = mongoose.model('log', LogSchema);
