@@ -8,6 +8,7 @@ const chequeRouter = require('./routes/cheque-route');
 const circuitRouter = require('./routes/circuit-route');
 const logRouter = require('./routes/log-route');
 const paymentRouter = require('./routes/payment-route');
+const userRouter = require('./routes/user-route');
 //
 
 dotenv.config();
@@ -53,8 +54,8 @@ app.use('/cmg/v0/logs', logRouter);
 //Payment routes
 app.use('/cmg/v0/payments', paymentRouter);
 
-//Power Plant Data routes
-//app.use('/cmg/v0/power-plant-data', powerPlantRouter);
+//User routes
+app.use('/cmg/v0/users', userRouter);
 
 //Customer Billing Data routes
 //app.use('/cmg/v0/customer-billing-data', customerBillingRouter);

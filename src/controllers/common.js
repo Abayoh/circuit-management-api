@@ -22,7 +22,7 @@ exports.create = async (data, res, model, findBy) => {
 exports.createMany = async (arr, res, model) => {
   try {
     //check for unique objects in array of objects
-    
+
     const result = await model.insertMany(arr);
     return res.status(200).json({
       success: true,
@@ -61,6 +61,12 @@ exports.updateOne = async (req, res, model) => {
   try {
     const data = await req.body;
     const { id } = req.params;
+    const doesItemExist = await model.exists({ _id: id });
+
+    if (!doesItemExist)
+      return res
+        .status(403)
+        .json({ msg: `${model.modelName.slice(0, -1)} do not exist` });
     const { modifiedCount } = await model.updateOne({ _id: id }, data);
     if (modifiedCount === 0) {
       return res.status(500).json({
