@@ -88,12 +88,13 @@ const PaymentSchema = new mongoose.Schema(
       min: 0,
       required: [true, 'payment balance is required'],
     },
-    depositedDate: {
+    dateDeposited: {
       type: Number,
       required: [true, 'Deposited Date is required'],
     },
   },
   { versionKey: false }
 );
+
 
 module.exports = mongoose.model('payment', PaymentSchema);

@@ -19,6 +19,20 @@ exports.create = async (data, res, model, findBy) => {
   }
 };
 
+exports.createMany = async (arr, res, model) => {
+  try {
+    //check for unique objects in array of objects
+    
+    const result = await model.insertMany(arr);
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
+
 exports.readAll = async (res, model) => {
   try {
     let data = await model.find({});
