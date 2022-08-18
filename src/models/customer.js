@@ -29,9 +29,7 @@ const addressSchema = new mongoose.Schema(
 
 const CustomerSchema = new mongoose.Schema(
   {
-    _id:{
-      type:String,
-    },
+    id:String,
     name: {
       type: String,
       trim: true,

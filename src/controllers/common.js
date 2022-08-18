@@ -21,7 +21,18 @@ exports.create = async (data, res, model, findBy) => {
 
 exports.readAll = async (res, model) => {
   try {
-    const data = await model.find({});
+    let data = await model.find({});
+    //TODO: remove this part after development
+    data = data.map((d) => {
+      let obj = d.toObject();
+      if (obj.id) {
+        let newObj = { ...obj, _id: obj.id };
+        delete newObj.id;
+        return newObj;
+      }
+      return obj;
+    });
+    //todo ends here
     return res.status(200).json({
       success: true,
       count: data.length,
