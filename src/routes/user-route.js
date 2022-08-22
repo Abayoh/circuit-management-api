@@ -9,12 +9,12 @@ userRouter.use('/:id', validateId);
 userRouter
   .route('/:id')
   .get(cController.getUserById)
-  .put(cController.updateUser)
+  .patch(cController.updateUser)
   .delete(cController.deleteUser);
 
-userRouter.use('/roles/:id', validateId);
-userRouter.route('/roles/:id').put(cController.changeUserRole);
-userRouter.use('/password/:id', validateId);
-userRouter.route('/password/:id').put(cController.changePassword);
+userRouter.use('/:id/roles', validateId);
+userRouter.route('/:id/roles').put(cController.changeUserRole);
+userRouter.use('/:id/password', validateId);
+userRouter.route('/:id/password').put(cController.changePassword);
 
 module.exports = userRouter;

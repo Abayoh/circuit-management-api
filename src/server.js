@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-//const financialDataRouter = require('./routes/financial-data-routes.js');
+const createError = require('http-errors');
+const { default: mongoose } = require('mongoose');
+const {verifyAccessToken} = require('./helpers/jwt-helpers')
 const connectDb = require('./config/db-config.js');
 const customerRouter = require('./routes/customer-route');
 const chequeRouter = require('./routes/cheque-route');
@@ -9,6 +11,7 @@ const circuitRouter = require('./routes/circuit-route');
 const logRouter = require('./routes/log-route');
 const paymentRouter = require('./routes/payment-route');
 const userRouter = require('./routes/user-route');
+const authRouter = require('./routes/auth-route');
 //
 
 dotenv.config();
@@ -33,35 +36,46 @@ app.get('/cmg/v0', (req, res) => {
   });
 });
 
-//Enable login
-//app.use('/cmg/v0/login', loginRouter);
+//Enable auth
+app.use('/cmg/v0/auth', authRouter);
 
 //Enable authentication middleware
 //app.use(authenticate);
 
+
 //Customers routes
-app.use('/cmg/v0/customers', customerRouter);
+app.use('/cmg/v0/customers', verifyAccessToken, customerRouter);
 
 //Cheque routes
-app.use('/cmg/v0/cheques', chequeRouter);
+app.use('/cmg/v0/cheques',verifyAccessToken, chequeRouter);
 
 //Circuit routes
-app.use('/cmg/v0/circuits', circuitRouter);
+app.use('/cmg/v0/circuits',verifyAccessToken, circuitRouter);
 
 //Log routes
-app.use('/cmg/v0/logs', logRouter);
+app.use('/cmg/v0/logs',verifyAccessToken, logRouter);
 
 //Payment routes
-app.use('/cmg/v0/payments', paymentRouter);
+app.use('/cmg/v0/payments',verifyAccessToken, paymentRouter);
 
 //User routes
-app.use('/cmg/v0/users', userRouter);
+app.use('/cmg/v0/users', verifyAccessToken, userRouter);
 
-//Customer Billing Data routes
-//app.use('/cmg/v0/customer-billing-data', customerBillingRouter);
+app.use((req, res, next) => {
+  next(createError.NotFound());
+});
 
-//Department Wage routes.
-//app.use('/cmg/v0/department-wages', departmentWageRouter);
+app.use((err, req, res, next) => {
+  if (err instanceof mongoose.Error.ValidationError || err.isJoi)
+    err.status = 422;
+  res.status(err.status || 500);
+  res.send({
+    error: {
+      status: err.status || 500,
+      message: err.message,
+    },
+  });
+});
 
 const PORT = process.env.PORT || 5001;
 

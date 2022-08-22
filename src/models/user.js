@@ -1,4 +1,5 @@
 const { default: mongoose } = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const validateEmail = function (email) {
   var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -12,7 +13,7 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       required: [true, 'User name is required'],
     },
-    
+
     email: {
       type: String,
       trim: true,
@@ -38,12 +39,32 @@ const UserSchema = new mongoose.Schema(
       min: [10, 'Phone Number should be atleast ten digits'],
       unique: true,
     },
-    hashedPassword: {
+    password: {
       type: String,
       required: [true],
+      minlength: 5,
     },
   },
   { versionKey: false }
 );
+
+UserSchema.methods.isValidPassword = async function(password){
+  try {
+    return await bcrypt.compare(password, this.password);
+  } catch (error) {
+    throw error
+  }
+}
+
+const hashedPassword = async function (next) {
+  
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+};
+
+UserSchema.pre('save', hashedPassword);
+
+//UserSchema.pre('updateOne', hashedPassword);
 
 module.exports = mongoose.model('user', UserSchema);

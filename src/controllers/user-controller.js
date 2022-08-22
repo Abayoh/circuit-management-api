@@ -1,39 +1,36 @@
-const UserSchema = require('../models/User');
-const bcrypt = require('bcryptjs');
+const User = require('../models/User');
 const { findOne } = require('../models/User');
+const createError = require('http-errors');
+const bcrypt = require('bcryptjs');
+const { userSchema } = require('../models/joi-schema');
 
 //@desc Create new user in the database
 //@route POST /api/v0/users
 //@access private
 exports.createUser = async (req, res, next) => {
   try {
-    const { fullName, email, phoneNumber, password, roles } = req.body;
-    let user = await UserSchema.findOne({ $or: [{ email }, { phoneNumber }] });
+    const result = await userSchema.validateAsync(req.body);
+    console.log('hey');
+    let user = await User.findOne({
+      $or: [{ email: result.email }, { phoneNumber: result.phoneNumber }],
+    });
     if (user) {
-      return res.status(400).json({
-        msg: 'User with this email or phone number already exist',
-      });
+      throw createError.Conflict(
+        `email:${email} or phoneNumbr:${phoneNumber} already exist`
+      );
     }
 
-    user = new UserSchema({
-      fullName,
-      email,
-      phoneNumber,
-      hashedPassword: password,
-      roles,
-    });
+    user = new User(result);
 
-    const salt = await bcrypt.genSalt(10);
-    user.hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = await (await user.save()).toObject();
-    console.log(newUser);
-    delete newUser.hashedPassword;
+    const newUser = await user.save();
+
+    //delete newUser.password;
     return res.status(200).json({
       success: true,
       data: newUser,
     });
   } catch (error) {
-    res.status(500).json({ error });
+    next(error);
   }
 };
 
@@ -42,14 +39,14 @@ exports.createUser = async (req, res, next) => {
 //@access private
 exports.getUsers = async (req, res, next) => {
   try {
-    const users = await UserSchema.find().select('-hashedPassword').lean();
+    const users = await User.find().select('-password').lean();
     return res.status(200).json({
       success: true,
       count: users.length,
       data: users,
     });
   } catch (error) {
-    res.status(500).json({ error });
+    next(error);
   }
 };
 
@@ -59,17 +56,15 @@ exports.getUsers = async (req, res, next) => {
 exports.getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const user = await UserSchema.findById(id).select('-hashedPassword').lean();
-    if (!user)
-      res.status(404).json({
-        msg: 'user does not exist',
-      });
+    const user = await User.findById(id).select('-password').lean();
+    if (!user) throw createError.NotFound('user do not exist');
+
     return res.status(200).json({
       success: true,
       data: user,
     });
   } catch (error) {
-    res.status(500).json({ error });
+    next(error);
   }
 };
 
@@ -79,75 +74,68 @@ exports.getUserById = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const { fullName, phoneNumber } = req.body;
-    if (!fullName || !phoneNumber) {
-      return res.status(400).json({
-        msg: 'Incomplete data',
-      });
-    }
 
     const { id } = req.params;
 
-    const doesUserExist = await UserSchema.exists({ _id: id });
-    if (!doesUserExist) {
-      return res.status(404).json({
-        msg: 'User does not exist',
-      });
-    }
+    const doesUserExist = await User.exists({ _id: id });
+    if (!doesUserExist) throw createError.NotFound('user does not exit');
 
-    const { modifiedCount } = await UserSchema.updateOne(
+    const { modifiedCount } = await User.updateOne(
       { _id: id },
-      { fullName, phoneNumber }
+      { fullName, phoneNumber },
+      { runValidators: true }
     );
+
     if (modifiedCount === 0) {
       return res.status(500).json({
         success: false,
         msg: '0 modified',
       });
     }
-    console.log(id);
+
     return res.status(200).json({
       success: true,
       data: { fullName, phoneNumber, id },
     });
   } catch (error) {
-    res.status(500).json({ error });
+    next(error);
   }
 };
 //@desc change user password in the database
 //@route PUT /api/v0/users/change-password/:id
 //@access private
 exports.changePassword = async (req, res, next) => {
-  console.log('pass');
+  console.log('hey');
   try {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword)
-      return res.status(403).json({
-        msg: 'Bad request, Please provide the old password as well as the new password.',
-      });
+      throw createError.BadRequest(
+        'Bad request, Please provide the old password as well as the new password.'
+      );
     const { id } = req.params;
 
     //Get user from database
-    const user = await UserSchema.findOne({ _id: id });
-    if (!user) return res.status(404).json({ msg: 'user does not exist' });
+    const user = await User.findOne({ _id: id });
+    if (!user) throw createError.NotFound('user does not exist');
 
     //Verify old password
-    const isMatch = await bcrypt.compare(oldPassword, user.hashedPassword);
-    if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
-    console.log('matched');
-    //Hash new password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) throw createError.Unauthorized('Wrong Password');
+
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-    //Update password in database
-    const result = await UserSchema.updateOne(
+    const password = await bcrypt.hash(newPassword, salt);
+
+    const result = await User.updateOne(
       { _id: id },
-      { password: hashedPassword }
+      { password },
+      { runValidators: true }
     );
     return res.status(200).json({
       success: true,
-      data: result,
+      data: { _id: id },
     });
   } catch (error) {
-    res.status(500).json({ error });
+    next(error);
   }
 };
 
@@ -157,19 +145,18 @@ exports.changePassword = async (req, res, next) => {
 exports.changeUserRole = async (req, res, next) => {
   try {
     const { role } = await req.body;
-    if (!role)
-      return res
-        .status(400)
-        .json({ msg: 'Bad request, User role is required' });
-
     const { id } = req.params;
-    
+
     //Get user from database
-    const user = await UserSchema.findById(id);
-    if (!user) return res.status(404).json({ msg: 'user does not exist' });
+    const user = await User.findById(id);
+    if (!user) throw createError.NotFound('user does not exist');
 
     //Update role in database
-    const result = await UserSchema.updateOne({ _id: id }, { role });
+    const result = await User.updateOne(
+      { _id: id },
+      { role },
+      { runValidators: true }
+    );
     return res.status(200).json({
       success: true,
       data: result,
@@ -185,9 +172,8 @@ exports.changeUserRole = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (!isValidId(id))
-      return res.status(400).json({ msg: 'Invalid user Id' });
-    const result = await UserSchema.findByIdAndDelete({ _id: id });
+    if (!isValidId(id)) return res.status(400).json({ msg: 'Invalid user Id' });
+    const result = await User.findByIdAndDelete({ _id: id });
     return res.status(200).json({
       success: true,
       data: result,
@@ -196,4 +182,3 @@ exports.deleteUser = async (req, res, next) => {
     return res.status(500).json({ msg: error.message });
   }
 };
-
