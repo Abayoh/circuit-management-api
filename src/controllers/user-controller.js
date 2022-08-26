@@ -10,7 +10,7 @@ const { userSchema } = require('../models/joi-schema');
 exports.createUser = async (req, res, next) => {
   try {
     const result = await userSchema.validateAsync(req.body);
-    
+
     let user = await User.findOne({
       $or: [{ email: result.email }, { phoneNumber: result.phoneNumber }],
     });
@@ -40,11 +40,7 @@ exports.createUser = async (req, res, next) => {
 exports.getUsers = async (req, res, next) => {
   try {
     const users = await User.find().select('-password').lean();
-    return res.status(200).json({
-      success: true,
-      count: users.length,
-      data: users,
-    });
+    return res.send(users);
   } catch (error) {
     next(error);
   }
@@ -59,10 +55,7 @@ exports.getUserById = async (req, res, next) => {
     const user = await User.findById(id).select('-password').lean();
     if (!user) throw createError.NotFound('user do not exist');
 
-    return res.status(200).json({
-      success: true,
-      data: user,
-    });
+    return res.send(user);
   } catch (error) {
     next(error);
   }
@@ -86,17 +79,10 @@ exports.updateUser = async (req, res, next) => {
       { runValidators: true }
     );
 
-    if (modifiedCount === 0) {
-      return res.status(500).json({
-        success: false,
-        msg: '0 modified',
-      });
-    }
+    if (modifiedCount === 0)
+      throw createError.InternalServerError('0 modified');
 
-    return res.status(200).json({
-      success: true,
-      data: { fullName, phoneNumber, id },
-    });
+    return res.send({ fullName, phoneNumber, _id: id });
   } catch (error) {
     next(error);
   }
@@ -105,13 +91,14 @@ exports.updateUser = async (req, res, next) => {
 //@route PUT /api/v0/users/change-password/:id
 //@access private
 exports.changePassword = async (req, res, next) => {
-  
   try {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword)
       throw createError.BadRequest(
         'Bad request, Please provide the old password as well as the new password.'
       );
+
+      
     const { id } = req.params;
 
     //Get user from database
@@ -130,10 +117,7 @@ exports.changePassword = async (req, res, next) => {
       { password },
       { runValidators: true }
     );
-    return res.status(200).json({
-      success: true,
-      data: { _id: id },
-    });
+    return res.sendStatus(204);
   } catch (error) {
     next(error);
   }
@@ -172,12 +156,10 @@ exports.changeUserRole = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (!isValidId(id)) return res.status(400).json({ msg: 'Invalid user Id' });
-    const result = await User.findByIdAndDelete({ _id: id });
-    return res.status(200).json({
-      success: true,
-      data: result,
-    });
+
+    await User.findByIdAndDelete({ _id: id });
+
+    return res.send({_id:id});
   } catch (error) {
     return res.status(500).json({ msg: error.message });
   }

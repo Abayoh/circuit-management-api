@@ -13,13 +13,11 @@ const CircuitSchema = new mongoose.Schema(
         type: String,
         trim: true,
         required:[true],
-        unique: true,
     },
     capacity:{
         type: String,
         trim: true,
         required:[true],
-        unique: true,
     },
     cost:{
         type: Number,

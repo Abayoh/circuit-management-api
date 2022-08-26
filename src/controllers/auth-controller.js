@@ -48,7 +48,7 @@ exports.loginUser = async (req, res, next) => {
       httpOnly: true,
     });
 
-    res.status(200).json({ accessToken, userData });
+    res.send(accessToken);
   } catch (error) {
     next(error);
   }

@@ -111,7 +111,7 @@ module.exports = {
       if (aud) {
         resolve({ userId: aud });
       } else {
-        return reject(aud);
+        return reject(createError.BadRequest());
       }
     });
   },

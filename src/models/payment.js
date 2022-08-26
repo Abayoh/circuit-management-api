@@ -82,7 +82,7 @@ const PaymentSchema = new mongoose.Schema(
     current: {
       type: Boolean,
     },
-    Billed: billedSchema,
+    billed: billedSchema,
     balance: {
       type: Number,
       min: 0,

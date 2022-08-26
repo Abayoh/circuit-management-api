@@ -1,33 +1,36 @@
-exports.create = async (data, res, model, findBy) => {
+const createError = require('http-errors');
+
+exports.create = async (data, res, model, next, findBy) => {
   try {
-    //check for unique objects in array of objects
+    //check for unique objects in array of objects\
+    if (!data) throw createError.BadRequest();
     if (findBy) {
       const existingData = await model.findOne({
         [findBy]: model[findBy],
       });
       if (existingData) {
-        return res.status(400).json({ msg: `This ${findBy} already exists` });
+        return createError.Conflict(`This resource already exists`);
       }
     }
     const result = await model.create(data);
     return res.send(result);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+     next(error);
   }
 };
 
-exports.createMany = async (arr, res, model) => {
+exports.createMany = async (arr, res, model, next) => {
   try {
     //check for unique objects in array of objects
 
     const result = await model.insertMany(arr);
     return res.send(result);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    next(error)
   }
 };
 
-exports.readAll = async (res, model) => {
+exports.readAll = async (res, model, next) => {
   try {
     let data = await model.find({});
     //TODO: remove this part after development
@@ -43,29 +46,27 @@ exports.readAll = async (res, model) => {
     //todo ends here
     return res.send(data);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    next(error);
   }
 };
 
-exports.updateOne = async (req, res, model) => {
+exports.updateOne = async (req, res, model, next) => {
   try {
-    const data = await req.body;
+    const data = req.body;
     const { id } = req.params;
+    if (!data || !id) throw createError.BadRequest('id and body is required');
+
     const doesItemExist = await model.exists({ _id: id });
 
     if (!doesItemExist)
-      return res
-        .status(403)
-        .json({ msg: `${model.modelName.slice(0, -1)} do not exist` });
-    const { modifiedCount } = await model.updateOne({ _id: id }, data);
-    if (modifiedCount === 0) {
-      return res.status(500).json({
-        success: false,
-        msg: '0 modified',
-      });
-    }
+      throw createError.BadRequest(
+        `${model.modelName.slice(0, -1)} do not exist`
+      );
+
+    const { modifiedCount } = await model.updateOne({ _id: id }, data, { runValidators: true });
+    if (modifiedCount === 0) throw createError.InternalServerError("0 modified");
     return res.send(data);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    next(error);
   }
 };
