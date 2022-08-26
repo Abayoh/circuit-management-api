@@ -1,5 +1,5 @@
 const Joi = require('@hapi/joi');
-Joi.objectId = require('joi-objectid')(Joi);
+
 
 const userSchema = Joi.object({
   fullName: Joi.string().min(3).required(),
@@ -34,15 +34,26 @@ const authSchema = Joi.object({
     .required(),
 });
 
-
 const chequeSchema = Joi.object({
   customerId: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .required(),
-  amount: Joi.number().min(0).required(),
+  amount: Joi.number().min(50).required(),
   imageUrl: Joi.string().required(),
 });
 
+const address = Joi.object({
+  address1: Joi.string().required(),
+  street: Joi.string().required(),
+  city: Joi.string().required(),
+  county: Joi.string().required(),
+}).required();
+const customerSchema = Joi.object({
+  name: Joi.string().required(),
+  type: Joi.string().required(),
+  contacts: Joi.string().required(),
+  address: address
+});
 
 const circuitSchema = Joi.object({
   name: Joi.string().required(),
@@ -54,27 +65,13 @@ const circuitSchema = Joi.object({
 });
 
 
-const address = Joi.object({
-  address1: Joi.string().required(),
-  street: Joi.string().required(),
-  city: Joi.string().required(),
-  county: Joi.string().required(),
-});
-const customerSchema = Joi.object({
-  name: Joi.string().required(),
-  type: Joi.string().required(),
-  contacts: Joi.string().required(),
-  address: Joi.object(address).required(),
-});
-
-
 const logSchema = Joi.object({
   userId: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .required(),
   action: Joi.string().required(),
   dataType: Joi.string().required(),
-  old: Joi.object(),
+  old: Joi.object().required(),
 });
 
 
@@ -82,18 +79,18 @@ const previousBalanceSchema = Joi.object({
   paymentId: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .required(),
-  amount: Joi.number().min(1),
-});
+  amount: Joi.number().min(1).required(),
+}).required();
 const billedSchema = Joi.object({
-  from: Joi.date(),
-  to: Joi.date(),
-});
+  from: Joi.date().required(),
+  to: Joi.date().required(),
+}).required();
 const paymentCircuitSchema = Joi.object({
   name: Joi.string().required(),
   cost: Joi.number().min(10).required(),
-});
+}).required();
 const paymentSchema = Joi.object({
-  amount: Joi.number().min(1),
+  amount: Joi.number().min(1).required(),
   receiveBy: Joi.string().required(),
   customerName: Joi.string().required(),
   customerId: Joi.string()
@@ -103,17 +100,18 @@ const paymentSchema = Joi.object({
     .regex(/^[0-9a-fA-F]{24}$/)
     .required(),
   dateDeposited: Joi.date(),
-  previousBalance: Joi.object(previousBalanceSchema),
-  billed: Joi.object(billedSchema),
-  circuit: Joi.object(paymentCircuitSchema),
+  previousBalance: previousBalanceSchema,
+  billed: billedSchema,
+  circuit: paymentCircuitSchema,
 });
+
 
 module.exports = {
   userSchema,
   authSchema,
   chequeSchema,
-  circuitSchema,
   customerSchema,
+  circuitSchema,
   logSchema,
   paymentSchema,
 };

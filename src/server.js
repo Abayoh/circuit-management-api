@@ -45,22 +45,22 @@ app.get('/api/v0', (req, res) => {
 });
 
 //Enable auth
-app.use('/api/v0/auth', verifyAccessToken, authRouter);
+app.use('/api/v0/auth', authRouter);
 
 //Enable authentication middleware
 //app.use(authenticate);
 
 //Customers routes
-app.use('/api/v0/customers', verifyAccessToken, customerRouter);
+app.use('/api/v0/customers',  customerRouter);
 
 //Cheque routes
 app.use('/api/v0/cheques', chequeRouter);
 
 //Circuit routes
-app.use('/api/v0/circuits', verifyAccessToken, circuitRouter);
+app.use('/api/v0/circuits',  circuitRouter);
 
 //Log routes
-app.use('/api/v0/logs', verifyAccessToken, logRouter);
+app.use('/api/v0/logs',  logRouter);
 
 //Payment routes
 app.use('/api/v0/payments', paymentRouter);
@@ -73,6 +73,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log(err);
   if (err instanceof mongoose.Error.ValidationError || err.isJoi)
     err.status = 422;
   res.status(err.status || 500);

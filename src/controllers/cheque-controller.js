@@ -1,5 +1,6 @@
-const ChequeSchema = require('../models/cheque');
+const Cheque = require('../models/cheque');
 const common = require('./common');
+const { chequeSchema } = require('../models/joi-schema');
 const createError = require('http-errors');
 
 //@desc Create a new Cheque  in mongodb
@@ -7,10 +8,10 @@ const createError = require('http-errors');
 //@access Private
 exports.createCheque = async (req, res, next) => {
   try {
-    const data = req.body;
-    common.create(data, res, ChequeSchema, next);
+    const result = await chequeSchema.validateAsync(req.body);
+    common.create(result, res, Cheque, next);
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
@@ -18,14 +19,21 @@ exports.createCheque = async (req, res, next) => {
 //@route GET /cmg/v0/Cheque-billing-data
 //@access Private
 exports.getCheques = async (req, res, next) => {
-  common.readAll(res, ChequeSchema, next);
+  common.readAll(res, Cheque, next);
 };
 
 //@desc Update a Cheque in mongodb
 //@route PUT /cmg/v0/:id
 //@access Private
 exports.updateCheque = async (req, res, next) => {
-  common.updateOne(req, res, ChequeSchema, next);
+  try {
+    const result = await chequeSchema.validateAsync(req.body);
+    const {id} = req.params
+    const temp = {id, data:result}
+    common.updateOne(temp, res, Cheque, next);
+  } catch (err) {
+    next(err);
+  }
 };
 
 //@desc Delete Document from mongodb

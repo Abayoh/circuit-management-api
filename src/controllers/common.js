@@ -2,14 +2,13 @@ const createError = require('http-errors');
 
 exports.create = async (data, res, model, next, findBy) => {
   try {
-    //check for unique objects in array of objects\
-    if (!data) throw createError.BadRequest();
+    
     if (findBy) {
       const existingData = await model.findOne({
-        [findBy]: model[findBy],
+        [findBy]: data[findBy],
       });
       if (existingData) {
-        return createError.Conflict(`This resource already exists`);
+        throw createError.Conflict(`This resource already exists`);
       }
     }
     const result = await model.create(data);
@@ -52,9 +51,9 @@ exports.readAll = async (res, model, next) => {
 
 exports.updateOne = async (req, res, model, next) => {
   try {
-    const data = req.body;
-    const { id } = req.params;
-    if (!data || !id) throw createError.BadRequest('id and body is required');
+    const {data} = req;
+    const { id } = req;
+    if (!id) throw createError.BadRequest('id is required in the url');
 
     const doesItemExist = await model.exists({ _id: id });
 
@@ -64,7 +63,7 @@ exports.updateOne = async (req, res, model, next) => {
       );
 
     const { modifiedCount } = await model.updateOne({ _id: id }, data, { runValidators: true });
-    if (modifiedCount === 0) throw createError.InternalServerError("0 modified");
+    if (modifiedCount === 0) throw createError.Conflict('duplicate data');
     return res.send(data);
   } catch (error) {
     next(error);

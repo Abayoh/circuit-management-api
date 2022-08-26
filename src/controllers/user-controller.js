@@ -16,7 +16,7 @@ exports.createUser = async (req, res, next) => {
     });
     if (user) {
       throw createError.Conflict(
-        `email:${email} or phoneNumbr:${phoneNumber} already exist`
+        `email:${email} or phoneNumber:${phoneNumber} already exist`
       );
     }
 
@@ -80,7 +80,7 @@ exports.updateUser = async (req, res, next) => {
     );
 
     if (modifiedCount === 0)
-      throw createError.InternalServerError('0 modified');
+      throw createError.Conflict('0 modified');
 
     return res.send({ fullName, phoneNumber, _id: id });
   } catch (error) {
@@ -128,8 +128,10 @@ exports.changePassword = async (req, res, next) => {
 //@access private
 exports.changeUserRole = async (req, res, next) => {
   try {
-    const { role } = await req.body;
+    const { roles } = await req.body;
     const { id } = req.params;
+
+    //TODO: invidate user refresh if signed in
 
     //Get user from database
     const user = await User.findById(id);
@@ -138,15 +140,12 @@ exports.changeUserRole = async (req, res, next) => {
     //Update role in database
     const result = await User.updateOne(
       { _id: id },
-      { role },
+      { roles },
       { runValidators: true }
     );
-    return res.status(200).json({
-      success: true,
-      data: result,
-    });
+    return res.send({_id: id, roles})
   } catch (error) {
-    res.status(500).json({ error });
+    next(error)
   }
 };
 
@@ -157,10 +156,16 @@ exports.deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    await User.findByIdAndDelete({ _id: id });
+    const user = await User.findById(id);
+    if (!user) throw createError.NotFound('user does not exist');
+    
+    //TODO: if user is log in invalidate user refresh token
+
+    await User.deleteOne({ _id: id });
+
 
     return res.send({_id:id});
   } catch (error) {
-    return res.status(500).json({ msg: error.message });
+    next(error);
   }
 };
