@@ -1,10 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 const createError = require('http-errors');
 const { default: mongoose } = require('mongoose');
-const {verifyAccessToken} = require('./helpers/jwt-helpers')
+const { verifyAccessToken } = require('./helpers/jwt-helpers');
 const connectDb = require('./config/db-config.js');
+
 const customerRouter = require('./routes/customer-route');
 const chequeRouter = require('./routes/cheque-route');
 const circuitRouter = require('./routes/circuit-route');
@@ -20,14 +22,20 @@ dotenv.config();
 connectDb();
 
 const app = express();
+app.use(cookieParser());
 //Body Parser
 app.use(express.json());
 
 //Enable cors
-app.use(cors());
+app.use(
+  cors({
+    origin: ['http://localhost:3000'],
+    credentials: true,
+  })
+);
 
 //Add home response
-app.get('/cmg/v0', (req, res) => {
+app.get('/api/v0', (req, res) => {
   return res.status(200).json({
     msg: 'Welcome to CCL Capacity Manager Dashboard API',
     version: '1.0.0',
@@ -37,29 +45,28 @@ app.get('/cmg/v0', (req, res) => {
 });
 
 //Enable auth
-app.use('/cmg/v0/auth', authRouter);
+app.use('/api/v0/auth', verifyAccessToken, authRouter);
 
 //Enable authentication middleware
 //app.use(authenticate);
 
-
 //Customers routes
-app.use('/cmg/v0/customers', verifyAccessToken, customerRouter);
+app.use('/api/v0/customers', verifyAccessToken, customerRouter);
 
 //Cheque routes
-app.use('/cmg/v0/cheques',verifyAccessToken, chequeRouter);
+app.use('/api/v0/cheques', chequeRouter);
 
 //Circuit routes
-app.use('/cmg/v0/circuits',verifyAccessToken, circuitRouter);
+app.use('/api/v0/circuits', verifyAccessToken, circuitRouter);
 
 //Log routes
-app.use('/cmg/v0/logs',verifyAccessToken, logRouter);
+app.use('/api/v0/logs', verifyAccessToken, logRouter);
 
 //Payment routes
-app.use('/cmg/v0/payments',verifyAccessToken, paymentRouter);
+app.use('/api/v0/payments', paymentRouter);
 
 //User routes
-app.use('/cmg/v0/users', verifyAccessToken, userRouter);
+app.use('/api/v0/users', userRouter);
 
 app.use((req, res, next) => {
   next(createError.NotFound());

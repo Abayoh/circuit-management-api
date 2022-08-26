@@ -10,10 +10,7 @@ exports.create = async (data, res, model, findBy) => {
       }
     }
     const result = await model.create(data);
-    return res.status(200).json({
-      success: true,
-      data: result,
-    });
+    return res.send(result);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
@@ -24,10 +21,7 @@ exports.createMany = async (arr, res, model) => {
     //check for unique objects in array of objects
 
     const result = await model.insertMany(arr);
-    return res.status(200).json({
-      success: true,
-      data: result,
-    });
+    return res.send(result);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
@@ -47,11 +41,7 @@ exports.readAll = async (res, model) => {
       return obj;
     });
     //todo ends here
-    return res.status(200).json({
-      success: true,
-      count: data.length,
-      data,
-    });
+    return res.send(data);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
@@ -74,10 +64,7 @@ exports.updateOne = async (req, res, model) => {
         msg: '0 modified',
       });
     }
-    return res.status(200).json({
-      success: true,
-      data: data,
-    });
+    return res.send(data);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }

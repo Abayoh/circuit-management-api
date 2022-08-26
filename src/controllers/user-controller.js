@@ -10,7 +10,7 @@ const { userSchema } = require('../models/joi-schema');
 exports.createUser = async (req, res, next) => {
   try {
     const result = await userSchema.validateAsync(req.body);
-    console.log('hey');
+    
     let user = await User.findOne({
       $or: [{ email: result.email }, { phoneNumber: result.phoneNumber }],
     });
@@ -105,7 +105,7 @@ exports.updateUser = async (req, res, next) => {
 //@route PUT /api/v0/users/change-password/:id
 //@access private
 exports.changePassword = async (req, res, next) => {
-  console.log('hey');
+  
   try {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword)
