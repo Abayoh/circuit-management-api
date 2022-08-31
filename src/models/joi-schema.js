@@ -61,6 +61,7 @@ const circuitSchema = Joi.object({
     .regex(/^[0-9a-fA-F]{24}$/)
     .required(),
   capacity: Joi.string().required(),
+  customerName: Joi.string().required(),
   cost: Joi.number().min(1000).required(),
 });
 

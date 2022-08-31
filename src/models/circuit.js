@@ -19,6 +19,11 @@ const CircuitSchema = new mongoose.Schema(
         trim: true,
         required:[true],
     },
+    customerName:{
+      type: String,
+      trim: true,
+      required:[true],
+  },
     cost:{
         type: Number,
         required: [true, 'Cost is required'],

@@ -45,38 +45,45 @@ app.get('/api/v0', (req, res) => {
 });
 
 //Enable auth
-app.use('/api/v0/auth', authRouter);
+app.use('/api/v0/auth', verifyAccessToken, authRouter);
 
 //Enable authentication middleware
 //app.use(authenticate);
 
 //Customers routes
-app.use('/api/v0/customers',  customerRouter);
+app.use('/api/v0/customers', verifyAccessToken, customerRouter);
 
 //Cheque routes
-app.use('/api/v0/cheques', chequeRouter);
+app.use('/api/v0/cheques', verifyAccessToken, chequeRouter);
 
 //Circuit routes
-app.use('/api/v0/circuits',  circuitRouter);
+app.use('/api/v0/circuits', verifyAccessToken, circuitRouter);
 
 //Log routes
-app.use('/api/v0/logs',  logRouter);
+app.use('/api/v0/logs', logRouter);
 
 //Payment routes
-app.use('/api/v0/payments', paymentRouter);
+app.use('/api/v0/payments', verifyAccessToken, paymentRouter);
 
 //User routes
-app.use('/api/v0/users', userRouter);
+app.use('/api/v0/users', verifyAccessToken, userRouter);
 
 app.use((req, res, next) => {
   next(createError.NotFound());
 });
 
 app.use((err, req, res, next) => {
-  console.log(err);
+  
   if (err instanceof mongoose.Error.ValidationError || err.isJoi)
     err.status = 422;
+  if (err instanceof mongoose.Error.MongooseServerSelectionError){
+    console.log(err.message)
+    err.status = 500;
+    err.message = 'Cannot Connect To DB'
+  }
+    
   res.status(err.status || 500);
+
   res.send({
     error: {
       status: err.status || 500,

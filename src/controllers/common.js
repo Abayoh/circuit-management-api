@@ -64,7 +64,7 @@ exports.updateOne = async (req, res, model, next) => {
 
     const { modifiedCount } = await model.updateOne({ _id: id }, data, { runValidators: true });
     if (modifiedCount === 0) throw createError.Conflict('duplicate data');
-    return res.send(data);
+    return res.send({_id:id, ...data});
   } catch (error) {
     next(error);
   }

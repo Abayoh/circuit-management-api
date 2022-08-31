@@ -9,7 +9,7 @@ module.exports = {
       };
       const secret = process.env.ACCESS_TOKEN_SECRET;
       const options = {
-        expiresIn: '30s',
+        expiresIn: '5m',
         issuer: 'ccl.com.lr',
         audience: userId,
       };
@@ -59,7 +59,7 @@ module.exports = {
       const payload = {};
       const secret = process.env.REFRESH_TOKEN_SECRET;
       const options = {
-        expiresIn: '1y',
+        expiresIn: '7d',
         issuer: 'ccl.com.lr',
         audience: userId,
       };
