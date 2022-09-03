@@ -6,7 +6,9 @@ const common = require('./common');
 //@access Private
 exports.createPayments = async (req, res, next) => {
   try {
-    const arr = req.body;
+    const { payments, chequeInfo } = req.body;
+    const file = req.file;
+    const arr = JSON.parse(payments);
     common.createMany(arr, res, Payment, next);
   } catch (err) {
     next(err);

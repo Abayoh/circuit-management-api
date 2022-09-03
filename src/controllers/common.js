@@ -23,6 +23,7 @@ exports.createMany = async (arr, res, model, next) => {
     //check for unique objects in array of objects
 
     const result = await model.insertMany(arr);
+    console.log(result);
     return res.send(result);
   } catch (error) {
     next(error)
