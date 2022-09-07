@@ -48,6 +48,9 @@ const circuitSchema = new mongoose.Schema(
 
 const PaymentSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+    },
     amount: {
       type: Number,
       trim: true,
@@ -57,25 +60,21 @@ const PaymentSchema = new mongoose.Schema(
       type: String,
       trim: true,
       required: [true, 'Recieveby  is required'],
-      unique: true,
     },
     customerName: {
       type: String,
       trim: true,
       required: [true, 'Customer name is required'],
-      unique: true,
     },
     customerId: {
       type: String,
       trim: true,
       required: [true, 'Customer Id is required'],
-
     },
     chequeId: {
       type: String,
       trim: true,
-      required: [true, 'ChequeId is required'],
-      
+      //required: [true, 'ChequeId is required'],
     },
     circuit: circuitSchema,
     previousBalance: previousBalanceSchema,
@@ -90,11 +89,9 @@ const PaymentSchema = new mongoose.Schema(
     },
     dateDeposited: {
       type: Number,
-      required: [true, 'Deposited Date is required'],
     },
   },
   { versionKey: false }
 );
-
 
 module.exports = mongoose.model('payment', PaymentSchema);

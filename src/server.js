@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const multer = require('multer');
 const cookieParser = require('cookie-parser');
 const createError = require('http-errors');
 const { default: mongoose } = require('mongoose');
@@ -73,15 +74,19 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  
   if (err instanceof mongoose.Error.ValidationError || err.isJoi)
     err.status = 422;
-  if (err instanceof mongoose.Error.MongooseServerSelectionError){
-    console.log(err.message)
+  if (err instanceof mongoose.Error.MongooseServerSelectionError) {
+    console.log(err.message);
     err.status = 500;
-    err.message = 'Cannot Connect To DB'
+    err.message = 'Cannot Connect To DB';
   }
-    
+
+  if (err instanceof multer.MulterError) {
+    console.log(err.message);
+    err.stack = 422;
+  }
+
   res.status(err.status || 500);
 
   res.send({

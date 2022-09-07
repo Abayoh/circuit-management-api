@@ -12,10 +12,11 @@ const ChequeSchema = new mongoose.Schema(
       min: 10,
       required: [true, 'Amount is required'],
     },
-    imageUrl: {
+    name: {
       type: String,
       trim: true,
-      required: [true, 'Image Url is required'],
+      required: [true, 'Cheque name is required'],
+      unique: true,
     },
   },
   { versionKey: false }
