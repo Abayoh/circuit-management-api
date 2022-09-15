@@ -1,7 +1,6 @@
 const { required } = require('@hapi/joi');
 const Joi = require('@hapi/joi');
 
-
 const userSchema = Joi.object({
   fullName: Joi.string().min(3).required(),
   email: Joi.string()
@@ -51,9 +50,10 @@ const address = Joi.object({
 }).required();
 const customerSchema = Joi.object({
   name: Joi.string().required(),
-  type: Joi.string().required(),
+  isShareholder: Joi.boolean().required(),
   contacts: Joi.string().required(),
-  address: address
+  address: address,
+  share: Joi.number().min(0).max(100).required(),
 });
 
 const circuitSchema = Joi.object({
@@ -64,6 +64,7 @@ const circuitSchema = Joi.object({
   capacity: Joi.string().required(),
   customerName: Joi.string().required(),
   cost: Joi.number().min(1000).required(),
+  miu: Joi.number().min(0).required(),
 });
 
 const logSchema = Joi.object({
@@ -96,10 +97,9 @@ const paymentSchema = Joi.object({
   balance: Joi.number().min(0).required(),
   current: Joi.bool().required(),
   customerId: Joi.string()
-   // .regex(/^[0-9a-fA-F]{24}$/)
+    // .regex(/^[0-9a-fA-F]{24}$/)
     .required(),
-  chequeId: Joi.string()
-    .required(),
+  chequeId: Joi.string().required(),
   dateDeposited: Joi.date(),
   previousBalance: previousBalanceSchema,
   billed: billedSchema,
@@ -107,7 +107,6 @@ const paymentSchema = Joi.object({
 });
 
 const paymentsSchema = Joi.array().items(paymentSchema);
-
 
 module.exports = {
   userSchema,

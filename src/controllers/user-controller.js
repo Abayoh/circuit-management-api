@@ -148,6 +148,26 @@ exports.changeUserRole = async (req, res, next) => {
     next(error)
   }
 };
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { password } = await req.body;
+    const { id } = req.params;
+
+    //TODO: invidate user refresh if signed in
+
+    //Get user from database
+    const user = await User.findById(id);
+    if (!user) throw createError.NotFound('user does not exist');
+
+    //reset password in database
+    user.password = password;
+
+    await user.save();
+    return res.sendStatus(204);
+  } catch (error) {
+    next(error)
+  }
+};
 
 //@desc Delete User from mongodb
 //@route DELETE /lec-api/v0/users/delete/:id

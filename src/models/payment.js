@@ -6,6 +6,7 @@ const previousBalanceSchema = new mongoose.Schema(
       type: String,
       trim: true,
       required: [true, 'PaymentId is required'],
+
     },
     amount: {
       type: Number,

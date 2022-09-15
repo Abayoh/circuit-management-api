@@ -28,7 +28,12 @@ const CircuitSchema = new mongoose.Schema(
         type: Number,
         required: [true, 'Cost is required'],
         min:0,
-    }
+    },
+    miu:{
+      type: Number,
+      required: [true, 'Miu is required'],
+      min:0,
+  }
 
   },
 

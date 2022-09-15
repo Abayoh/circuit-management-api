@@ -36,10 +36,9 @@ const CustomerSchema = new mongoose.Schema(
       required: [true, 'Customer Name is required'],
       unique: true,
     },
-    type: {
-      type: String,
-      trim: true,
-      required: [true, 'Customer Type is required'],
+    isShareholder: {
+      type: Boolean,
+      required: [true, 'Shareholder is required'],
     },
     address: addressSchema,
     contacts: {
@@ -47,6 +46,12 @@ const CustomerSchema = new mongoose.Schema(
       trim: true,
       required: [true, 'Contact is required'],
     },
+    share: {
+      type: Number,
+      min: 0,
+      max: 100,
+      required: [true, 'Share is required'],
+    }
   },
 
   { versionKey: false }
