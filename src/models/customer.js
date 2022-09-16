@@ -29,7 +29,7 @@ const addressSchema = new mongoose.Schema(
 
 const CustomerSchema = new mongoose.Schema(
   {
-    id:String,
+    id: String,
     name: {
       type: String,
       trim: true,
@@ -51,7 +51,12 @@ const CustomerSchema = new mongoose.Schema(
       min: 0,
       max: 100,
       required: [true, 'Share is required'],
-    }
+    },
+    imageUrl: {
+      type: String,
+      trim: true,
+      required: [true, 'Image is required'],
+    },
   },
 
   { versionKey: false }
