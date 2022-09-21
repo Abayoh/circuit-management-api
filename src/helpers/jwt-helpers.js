@@ -19,7 +19,7 @@ module.exports = {
           reject(createError.InternalServerError());
         }
 
-        (sessions[userId] = { roles: payload.roles, name:payload.name, refreshToken: '' }),
+        //(sessions[userId] = { roles: payload.roles, name:payload.name, refreshToken: '' }),
           resolve(token);
       });
     });
@@ -69,7 +69,7 @@ module.exports = {
           reject(createError.InternalServerError());
         }
 
-        sessions[userId] = { ...sessions[userId], refreshToken: token };
+        //sessions[userId] = { ...sessions[userId], refreshToken: token };
 
         resolve(token);
       });
@@ -84,14 +84,14 @@ module.exports = {
           if (err) return reject(createError.Unauthorized());
           const userId = payload.aud;
           //go to redis and verify that the refresh token exist
-          if (sessions[userId]?.refreshToken !== refreshToken) {
+          // if (sessions[userId]?.refreshToken !== refreshToken) {
             
-            return reject(createError.Unauthorized());
-          }
+          //   return reject(createError.Unauthorized());
+          // }
           //go to redis and retrieve user roles and name
-          const { roles, name } = sessions[userId];
+          // const { roles, name } = sessions[userId];
 
-          resolve({ userId, roles, name });
+          resolve({ userId, roles:['admin'], name:'name' });
         }
       );
     });
@@ -117,4 +117,4 @@ module.exports = {
   },
 };
 
-const sessions = {};
+//const sessions = {};
