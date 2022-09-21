@@ -1,4 +1,4 @@
-const Log = require('../models/Log');
+const Log = require('../models/log');
 const common = require('./common');
 const { logSchema } = require('../models/joi-schema');
 
