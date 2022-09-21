@@ -1,5 +1,5 @@
-const User = require('../models/User');
-const { findOne } = require('../models/User');
+const User = require('../models/user');
+const { findOne } = require('../models/user');
 const createError = require('http-errors');
 const bcrypt = require('bcryptjs');
 const { userSchema } = require('../models/joi-schema');
