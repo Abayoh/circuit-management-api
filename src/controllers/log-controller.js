@@ -20,4 +20,5 @@ exports.createLog = async (req, res, next) => {
 //@access Private
 exports.getLogs = async (req, res) => {
   common.readAll(res, Log);
+  
 };

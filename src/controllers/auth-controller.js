@@ -4,9 +4,8 @@ const jwt = require('jsonwebtoken');
 const { authSchema } = require('../models/joi-schema');
 const createError = require('http-errors');
 const {
-  signAccessToken,
+  generateTokens,
   verifyRefreshToken,
-  signRefreshToken,
   deletRefreshToken,
   decordToken,
 } = require('../helpers/jwt-helpers');
@@ -39,9 +38,9 @@ exports.loginUser = async (req, res, next) => {
       createdAt: user.createdAt,
       roles: user.roles,
     };
-    const accessToken = await signAccessToken(user.id, payload);
+    const {accessToken, refreshToken} = await generateTokens(user.id, payload);
 
-    const refreshToken = await signRefreshToken(user.id);
+    
 
     res.cookie('refreshToken', refreshToken, {
       maxAge: 3.154e10, // 1 year
@@ -59,11 +58,9 @@ exports.refreshToken = async (req, res, next) => {
     let { refreshToken } = req.cookies;
     if (!refreshToken) throw createError.BadRequest();
     const { userId, roles, name } = await verifyRefreshToken(refreshToken);
-    const accessToken = await signAccessToken(userId, { roles, name });
-    refreshToken = await signRefreshToken(userId);
-
-    
-    res.cookie('refreshToken', refreshToken, {
+    const {accessToken, refreshToken:newRefreshToken} = await generateTokens(userId, { roles, name });
+  
+    res.cookie('refreshToken', newRefreshToken, {
       maxAge: 3.154e10, // 1 year
       httpOnly: true,
     });
