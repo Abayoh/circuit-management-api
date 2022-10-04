@@ -26,7 +26,7 @@ exports.loginUser = async (req, res, next) => {
     if (!isMatched) throw createError.Unauthorized('Invalid credentials');
 
     const payload = {
-      name:user.fullName,
+      name: user.fullName,
       roles: user.roles,
     };
 
@@ -38,13 +38,16 @@ exports.loginUser = async (req, res, next) => {
       createdAt: user.createdAt,
       roles: user.roles,
     };
-    const {accessToken, refreshToken} = await generateTokens(user.id, payload);
-
-    
+    const { accessToken, refreshToken } = await generateTokens(
+      user.id,
+      payload
+    );
 
     res.cookie('refreshToken', refreshToken, {
       maxAge: 3.154e10, // 1 year
       httpOnly: true,
+      sameSite: 'none',
+      secure: true,
     });
 
     res.send(accessToken);
@@ -54,18 +57,18 @@ exports.loginUser = async (req, res, next) => {
 };
 exports.refreshToken = async (req, res, next) => {
   try {
-   
     let { refreshToken } = req.cookies;
     if (!refreshToken) throw createError.BadRequest();
     const { userId, roles, name } = await verifyRefreshToken(refreshToken);
-    const {accessToken, refreshToken:newRefreshToken} = await generateTokens(userId, { roles, name });
-  
+    const { accessToken, refreshToken: newRefreshToken } = await generateTokens(
+      userId,
+      { roles, name }
+    );
+
     res.cookie('refreshToken', newRefreshToken, {
       maxAge: 3.154e10, // 1 year
       httpOnly: true,
     });
-
-   
 
     res.send(accessToken);
   } catch (err) {
