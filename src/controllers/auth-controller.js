@@ -68,6 +68,8 @@ exports.refreshToken = async (req, res, next) => {
     res.cookie('refreshToken', newRefreshToken, {
       maxAge: 3.154e10, // 1 year
       httpOnly: true,
+      sameSite: 'none',
+      secure: true,
     });
 
     res.send(accessToken);
